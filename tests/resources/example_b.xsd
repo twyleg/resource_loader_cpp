@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<xs:schema
+	   id="example"
+	   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   elementFormDefault="unqualified">
+
+	   <xs:element name="Bar" type="xs:string"/>
+
+</xs:schema>

@@ -1,0 +1,17 @@
+// Copyright (C) 2023 twyleg
+#include "resource_loader.h"
+
+namespace {
+{% for resource in resources %}
+const std::vector<char> data_{{ resource.filepath_hash }} = {
+{%- for data_line in resource.data_lines %}
+    {{ data_line }}
+{%- endfor %}
+};
+{%- endfor %}
+
+{%- for resource in resources +%}
+ResourceLoader::Resource resource_{{ resource.filepath_hash }}("{{ resource.filepath }}", data_{{ resource.filepath_hash }});
+{%- endfor %}
+
+}
