@@ -1,1 +1,1 @@
-example resource two from app target
+example resource two from app

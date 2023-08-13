@@ -1,8 +1,8 @@
 // Copyright (C) 2021 twyleg
 #pragma once
 
-namespace libb {
+namespace liba {
 
-void helloFromLibB();
+void printResourceFromLibB();
 
 }

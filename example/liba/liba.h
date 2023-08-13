@@ -3,6 +3,6 @@
 
 namespace liba {
 
-void helloFromLibA();
+void printResourceFromLibA();
 
 }

@@ -1,4 +1,4 @@
-set(script ${CMAKE_CURRENT_LIST_DIR}/../resource_loader/resource_loader.py)
+set(script ${CMAKE_CURRENT_LIST_DIR}/../python/resource_loader/resource_loader.py)
 
 function(add_resources)
 
