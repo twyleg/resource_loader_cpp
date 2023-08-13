@@ -1,0 +1,52 @@
+// Copyright (C) 2023 twyleg
+#include "resource_loader.h"
+
+#include <vector>
+#include <unordered_map>
+#include <string>
+#include <iostream>
+
+namespace ResourceLoader {
+
+{% for resource in resources %}
+extern const std::vector<char> data_{{ resource.filepath_hash }};
+{%- endfor %}
+
+}
+
+namespace {
+
+std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap();
+
+void init(){
+{%- for resource in resources %}
+    getResourcesMap().emplace("{{ resource.filepath }}", ResourceLoader::data_{{ resource.filepath_hash }});
+{%- endfor %}
+}
+
+std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap() {
+    static std::unordered_map<std::string, const std::vector<char>&> resourceMap;
+
+    static bool isInitialized = false;
+    if (!isInitialized) {
+        isInitialized = true;
+        init();
+    }
+
+    return resourceMap;
+}
+
+}
+
+namespace ResourceLoader {
+
+
+std::string_view getResource(const std::string& resourceName){
+	auto& resource = getResourcesMap().find(resourceName)->second;
+	return std::string_view(resource.data(), resource.size());
+}
+
+
+
+
+}

@@ -6,7 +6,7 @@ import glob
 
 from subprocess import check_output, run
 from pathlib import Path
-from resource_loader.resource_loader import generate_resource, generate_resource_loader
+from resource_loader.resource_loader import generate_resources, generate_resource_loader
 
 FILE_DIR = Path(__file__).parent
 
@@ -27,6 +27,7 @@ class ImageTestCase(unittest.TestCase):
         cc_files = glob.glob(str(self.tmp_dir_path / "*.cc"))
         command = ["g++", "-o", self.tmp_dir_path / "test_util"]
         command.extend(cc_files)
+        print(command)
         run(command)
 
     def assert_resource(self, expected_content: str, resource_filepath: str):
@@ -34,11 +35,8 @@ class ImageTestCase(unittest.TestCase):
 
 
     def test_ImageWithMultipleLayers_GetListOfLayers_CorrectListOfLayersReturned(self):
-        generate_resource([Path("resources/example_a.txt"), Path("resources/example_a.xsd")], self.tmp_dir_path,
-                          "target_a")
-        generate_resource([Path("resources/example_b.txt"), Path("resources/example_b.xsd")], self.tmp_dir_path,
-                          "target_b")
-        generate_resource_loader(self.tmp_dir_path)
+        generate_resources([Path("resources/example_a.txt"), Path("resources/example_a.xsd")], self.tmp_dir_path)
+        generate_resources([Path("resources/example_b.txt"), Path("resources/example_b.xsd")], self.tmp_dir_path)
         self.compile_test_app()
         self.assert_resource("Example text file for target a.\n", "resources/example_a.txt")
         self.assert_resource("Example text file for target b.\n", "resources/example_b.txt")

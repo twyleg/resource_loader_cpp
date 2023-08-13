@@ -11,6 +11,8 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
+    ResourceLoader::init();
+
 	std::cout << ResourceLoader::getResource(argv[1]);
 	return 0;
 }

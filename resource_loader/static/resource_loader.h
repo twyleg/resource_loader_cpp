@@ -6,15 +6,17 @@
 
 namespace ResourceLoader {
 
-class Resource {
+//class Resource {
 
-private:
+//private:
 
-public:
+//public:
 
-	Resource(const std::string& resourceName, const std::vector<char>& resourceData);
+//	Resource(const std::string& resourceName, const std::vector<char>& resourceData);
 
-};
+//};
+
+void init();
 
 std::string_view getResource(const std::string& resourceName);
 
