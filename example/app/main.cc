@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]) {
 
-	liba::helloFromLibA();
-	libb::helloFromLibB();
+	liba::printResourceFromLibA();
+	libb::printResourceFromLibB();
 
 	return 0;
 }

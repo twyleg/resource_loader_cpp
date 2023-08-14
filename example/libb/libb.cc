@@ -4,7 +4,7 @@
 #include <fmt/core.h>
 
 
-namespace liba {
+namespace libb {
 
 void printResourceFromLibB() {
 	fmt::print(ResourceLoader::getResource("example_resource_from_libb.txt"));

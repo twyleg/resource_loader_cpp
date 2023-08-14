@@ -1,69 +1,74 @@
-set(script ${CMAKE_CURRENT_LIST_DIR}/../python/resource_loader/resource_loader.py)
+# Copyright (C) 2023 twyleg
+set(script ${CMAKE_CURRENT_LIST_DIR}/../python/resource_loader/resource_loader.py CACHE PATH "Resource loader python script location ")
+message(STATUS "Script: ${script}")
 
 function(add_resources)
 
-        message(STATUS "Adding resource")
+		message(STATUS "Adding resource")
 
-        find_package(Python3 REQUIRED COMPONENTS Interpreter)
+		find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-        if (NOT DEFINED Python3_FOUND)
-            message(FATAL_ERROR "Python3 not found. Please check your installation and PATH variable.")
-        endif()
+		if (NOT DEFINED Python3_FOUND)
+			message(FATAL_ERROR "Python3 not found. Please check your installation and PATH variable.")
+		endif()
 
-        set(oneValueArgs TARGET)
-        set(multiValueArgs RESOURCE_FILES)
-#	cmake_parse_arguments(ADD_RESOURCES "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-        cmake_parse_arguments(ADD_RESOURCES "" "" "${multiValueArgs}" ${ARGN} )
-
-
-        if (NOT TARGET resource_loader)
-            file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/resource_loader)
-        endif()
+		set(oneValueArgs TARGET)
+		set(multiValueArgs RESOURCE_FILES)
+		#	cmake_parse_arguments(ADD_RESOURCES "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+		cmake_parse_arguments(ADD_RESOURCES "" "" "${multiValueArgs}" ${ARGN} )
 
 
-        foreach(resource_file IN LISTS ADD_RESOURCES_RESOURCE_FILES)
-
-                message(STATUS "Resource file: ${resource_file}")
-
-                get_filename_component(OUTPUT_FILENAME ${resource_file} NAME)
-                set(OUTPUT_FILEPATH ${CMAKE_BINARY_DIR}/resource_loader/resource_${OUTPUT_FILENAME}.cc)
-
-                set(run_resource_loader COMMAND ${Python3_EXECUTABLE} ${script} -o ${CMAKE_BINARY_DIR}/resource_loader ${resource_file})
-
-                message(STATUS ${run_resource_loader})
-
-                execute_process(
-                        ${run_resource_loader}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-                )
-
-                add_custom_command(
-                        OUTPUT ${OUTPUT_FILEPATH}
-                        ${run_resource_loader}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-                        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${resource_file}
-                        COMMENT "Generating resource: ${CMAKE_CURRENT_SOURCE_DIR}/${resource_file}"
-                )
+		if (NOT TARGET resource_loader)
+			file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/resource_loader)
+		endif()
 
 
+		foreach(resource_file IN LISTS ADD_RESOURCES_RESOURCE_FILES)
 
-                if (NOT TARGET resource_loader)
+				message(STATUS "Resource file: ${resource_file}")
 
-                        message(STATUS "Creating resource_loader target")
+				get_filename_component(OUTPUT_FILENAME ${resource_file} NAME)
+				set(output_filepath ${CMAKE_BINARY_DIR}/resource_loader/resource_${OUTPUT_FILENAME}.cc)
 
-                        add_library(resource_loader
-                                ${CMAKE_BINARY_DIR}/resource_loader/resource_loader.cc
-                                ${CMAKE_BINARY_DIR}/resource_loader/resource_loader.h
-                        )
+				set(run_resource_loader ${Python3_EXECUTABLE} ${script} -o ${CMAKE_BINARY_DIR}/resource_loader ${resource_file})
 
-                        target_include_directories(resource_loader
-                                PUBLIC ${CMAKE_BINARY_DIR}/resource_loader/
-                        )
-                endif()
+				message(STATUS "${script}")
+#				message(STATUS "${run_resource_loader}")
 
-                target_sources(resource_loader PRIVATE ${OUTPUT_FILEPATH})
+#				message(STATUS ${run_resource_loader})
 
-        endforeach()
+				execute_process(
+						COMMAND ${Python3_EXECUTABLE} ${script} -o ${CMAKE_BINARY_DIR}/resource_loader ${resource_file}
+						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+				)
+
+				add_custom_command(
+						OUTPUT ${output_filepath}
+						COMMAND ${Python3_EXECUTABLE} ${script} -o ${CMAKE_BINARY_DIR}/resource_loader ${resource_file}
+						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+						MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${resource_file}
+						COMMENT "Generating resource: ${CMAKE_CURRENT_SOURCE_DIR}/${resource_file}"
+				)
+
+
+
+				if (NOT TARGET resource_loader)
+
+						message(STATUS "Creating resource_loader target")
+
+						add_library(resource_loader
+								${CMAKE_BINARY_DIR}/resource_loader/resource_loader.cc
+								${CMAKE_BINARY_DIR}/resource_loader/resource_loader.h
+						)
+
+						target_include_directories(resource_loader
+								PUBLIC ${CMAKE_BINARY_DIR}/resource_loader/
+						)
+				endif()
+
+				target_sources(resource_loader PRIVATE ${output_filepath})
+
+		endforeach()
 
 
 endfunction()
