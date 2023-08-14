@@ -1,13 +1,11 @@
+# Copyright (C) 2023 twyleg
 set(TARGET_NAME app)
 
 
 #
-# set cmake settings
+# add resources to be embedded in binary
 #
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-add_resources(TARGET app RESOURCE_FILES example_resource_one.txt example_resource_two.txt)
+add_resources(RESOURCE_FILES example_resource_one.txt example_resource_two.txt)
 
 
 #
@@ -15,6 +13,16 @@ add_resources(TARGET app RESOURCE_FILES example_resource_one.txt example_resourc
 #
 add_executable(${TARGET_NAME}
 	main.cc
+)
+
+
+#
+# set target properties
+#
+set_target_properties(${TARGET_NAME}
+        PROPERTIES
+        CXX_STANDARD 17
+        INCLUDE_CURRENT_DIR ON
 )
 
 

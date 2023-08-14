@@ -9,7 +9,7 @@ find_package(fmt REQUIRED)
 
 
 #
-# Add resource to be embedded in binary
+# add resource to be embedded in binary
 #
 add_resources(RESOURCE_FILES example_resource_from_liba.txt)
 
