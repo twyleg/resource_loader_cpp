@@ -6,7 +6,7 @@ import glob
 
 from subprocess import check_output, run
 from pathlib import Path
-from resource_loader.resource_loader import generate_resources, generate_resource_loader
+from resource_loader.resource_loader import generate_resources, _generate_resource_loader
 
 FILE_DIR = Path(__file__).parent
 
@@ -34,7 +34,7 @@ class ImageTestCase(unittest.TestCase):
         self.assertEqual(expected_content.encode(), check_output([self.tmp_dir_path / "test_util", resource_filepath]))
 
 
-    def test_ImageWithMultipleLayers_GetListOfLayers_CorrectListOfLayersReturned(self):
+    def test_CleanEnvironment_GenerateResources_ResourcesAvailable(self):
         generate_resources([Path("resources/example_a.txt"), Path("resources/example_a.xsd")], self.tmp_dir_path)
         generate_resources([Path("resources/example_b.txt"), Path("resources/example_b.xsd")], self.tmp_dir_path)
         self.compile_test_app()

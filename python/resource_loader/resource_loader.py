@@ -20,9 +20,9 @@ class Resource:
         self.filepath = filepath
         self.prefix = prefix
         self.name = f"{prefix}/{filepath}" if prefix else str(filepath)
-        self.name_hash = self.generate_short_hash(self.name)
+        self.name_hash = self._generate_short_hash(self.name)
         if load_data:
-            self.data_lines = self.load_data_lines_from_file(filepath)
+            self.data_lines = self._load_data_lines_from_file(filepath)
 
     def to_dict(self) -> dict:
         return {
@@ -36,16 +36,15 @@ class Resource:
         return Resource(Path(input["filepath"]), input["prefix"], load_data=False)
 
     @classmethod
-    def generate_short_hash(cls, input: str):
+    def _generate_short_hash(cls, input: str):
         return hashlib.sha1(input.encode("UTF-8")).hexdigest()[:10]
 
     @classmethod
-    def chunks(cls, lst, n):
+    def _chunks(cls, lst, n):
         return [lst[i:i + n] for i in range(0, len(lst), n)]
 
     @classmethod
-    def load_data_lines_from_file(cls, filepath: Path) -> List[str]:
-
+    def _load_data_lines_from_file(cls, filepath: Path) -> List[str]:
         values = []
         with open(filepath, "r") as file:
             while True:
@@ -55,29 +54,29 @@ class Resource:
                 values.append(ord(c))
 
         data_lines = []
-        for chunk in cls.chunks(values, 8):
+        for chunk in cls._chunks(values, 8):
             data_lines.append(" ".join(["{0:#0{1}x},".format(value, 4) for value in chunk]))
 
         return data_lines
 
 class Cache:
 
-    def __init__(self, output_dirpath: Path):
+    def __init__(self, output_dirpath: Path, cache_filename="resource_loader_cache.json"):
         self._output_dirpath = output_dirpath
-        self._cache_filepath = output_dirpath / "resource_loader_cache.json"
+        self._cache_filepath = output_dirpath / cache_filename
 
         if self._cache_filepath.exists():
-            self.cached_resources = self.read_cache()
+            self.cached_resources = self._read_cache()
         else:
             self.cached_resources: List[Resource] = []
 
-    def read_cache(self) -> List[Resource]:
+    def _read_cache(self) -> List[Resource]:
         with open(self._cache_filepath, "r") as cache_file:
             cache_file_data = cache_file.read()
             input_json = json.loads(cache_file_data)
             return [Resource.from_dict(resource_as_dict) for resource_as_dict in input_json["resources"]]
 
-    def add_resource_file_to_cache(self, resource: Resource):
+    def add_resource_to_cache(self, resource: Resource):
         self.cached_resources.append(resource)
 
     def get_cached_resources(self) -> List[Resource]:
@@ -91,8 +90,7 @@ class Cache:
             json.dump(output_obj, cache_file)
 
 
-def generate_resource_loader(resources: List[Resource], output_dir: Path):
-
+def _generate_resource_loader(resources: List[Resource], output_dir: Path):
     resource_loader_header_destination_filepath = output_dir / "resource_loader.h"
     if not resource_loader_header_destination_filepath.exists():
         shutil.copyfile(FILE_DIRPATH / "static/resource_loader.h", resource_loader_header_destination_filepath)
@@ -106,7 +104,7 @@ def generate_resource_loader(resources: List[Resource], output_dir: Path):
         output_file.write(template.render(resources=resources))
 
 
-def generate_resource(resource: Resource, output_dir: Path):
+def _generate_resource(resource: Resource, output_dir: Path):
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(FILE_DIRPATH / "templates/"))
     template = environment.get_template("resource.cc.jinja")
 
@@ -116,17 +114,7 @@ def generate_resource(resource: Resource, output_dir: Path):
         output_file.write(template.render(resource=resource))
 
 
-def generate_resources(resource_filepaths: List[Path], output_dir: Path, prefix: str = ""):
-    cache = Cache(output_dir)
-    for resource_filepath in resource_filepaths:
-        resource = Resource(resource_filepath, prefix)
-        generate_resource(resource, output_dir)
-        cache.add_resource_file_to_cache(resource)
-    cache.write_cache()
-    generate_resource_loader(cache.get_cached_resources(), output_dir)
-
-
-def parse_cli_args(cli_args: List[str] = None) -> Dict[str, Union[str, bool, List]]:
+def _parse_cli_args(cli_args: List[str] = None) -> Dict[str, Union[str, bool, List]]:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output_dir", dest="output_dir", default=DEFAULT_OUTPUT_DIRPATH,
                         help="Output directory")
@@ -136,15 +124,24 @@ def parse_cli_args(cli_args: List[str] = None) -> Dict[str, Union[str, bool, Lis
     return vars(parser.parse_args(cli_args))
 
 
+def generate_resources(resource_filepaths: List[Path], output_dir: Path, prefix: str = ""):
+    cache = Cache(output_dir)
+    for resource_filepath in resource_filepaths:
+        resource = Resource(resource_filepath, prefix)
+        _generate_resource(resource, output_dir)
+        cache.add_resource_to_cache(resource)
+    cache.write_cache()
+    _generate_resource_loader(cache.get_cached_resources(), output_dir)
+
+
 def start():
-    args = parse_cli_args()
+    args = _parse_cli_args()
 
     resource_filepaths = [Path(resource_file) for resource_file in args["resource_files"]]
-    output_dir = Path(args["output_dir"])
+    output_dirpath = Path(args["output_dir"])
     prefix = args["prefix"]
 
-    generate_resources(resource_filepaths, output_dir, prefix)
-
+    generate_resources(resource_filepaths, output_dirpath, prefix)
 
 
 if __name__ == '__main__':
