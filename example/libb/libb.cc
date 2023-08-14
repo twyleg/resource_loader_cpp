@@ -7,7 +7,7 @@
 namespace libb {
 
 void printResourceFromLibB() {
-	fmt::print(ResourceLoader::getResource("example_resource_from_libb.txt"));
+	fmt::print(ResourceLoader::getResource("libb/example_resource_from_libb.txt"));
 }
 
 }

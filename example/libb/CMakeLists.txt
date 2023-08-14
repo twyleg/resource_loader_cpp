@@ -11,7 +11,9 @@ find_package(fmt REQUIRED)
 #
 # Add resource to be embedded in binary
 #
-add_resources(RESOURCE_FILES example_resource_from_libb.txt)
+add_resources(PREFIX libb
+	example_resource_from_libb.txt
+)
 
 
 #

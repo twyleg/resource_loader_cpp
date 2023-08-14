@@ -7,7 +7,7 @@
 namespace liba {
 
 void printResourceFromLibA() {
-	fmt::print(ResourceLoader::getResource("example_resource_from_liba.txt"));
+	fmt::print(ResourceLoader::getResource("liba/example_resource_from_liba.txt"));
 }
 
 }

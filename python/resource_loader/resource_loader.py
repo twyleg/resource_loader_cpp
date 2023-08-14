@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import sys
 
 import jinja2
 import shutil
@@ -15,11 +16,24 @@ DEFAULT_OUTPUT_DIRPATH = Path.cwd()
 
 
 class Resource:
-    def __init__(self, filepath: Path, load_data=True):
+    def __init__(self, filepath: Path, prefix="", load_data=True):
         self.filepath = filepath
-        self.filepath_hash = self.generate_short_hash(str(filepath))
+        self.prefix = prefix
+        self.name = f"{prefix}/{filepath}" if prefix else str(filepath)
+        self.name_hash = self.generate_short_hash(self.name)
         if load_data:
             self.data_lines = self.load_data_lines_from_file(filepath)
+
+    def to_dict(self) -> dict:
+        return {
+            "filepath": str(self.filepath),
+            "prefix": self.prefix,
+            "name": self.name,
+        }
+
+    @classmethod
+    def from_dict(cls, input: dict) -> "Resource":
+        return Resource(Path(input["filepath"]), input["prefix"], load_data=False)
 
     @classmethod
     def generate_short_hash(cls, input: str):
@@ -53,56 +67,61 @@ class Cache:
         self._cache_filepath = output_dirpath / "resource_loader_cache.json"
 
         if self._cache_filepath.exists():
-
-            with open(self._cache_filepath, "r") as cache_file:
-                cache_file_data = cache_file.read()
-                self.cached_resources = json.loads(cache_file_data)
+            self.cached_resources = self.read_cache()
         else:
-            self.cached_resources = {
-                "files": []
-            }
+            self.cached_resources: List[Resource] = []
 
-    def add_resource_file_to_cache(self, resource_filepath: Path):
-        self.cached_resources["files"].append(str(resource_filepath))
+    def read_cache(self) -> List[Resource]:
+        with open(self._cache_filepath, "r") as cache_file:
+            cache_file_data = cache_file.read()
+            input_json = json.loads(cache_file_data)
+            return [Resource.from_dict(resource_as_dict) for resource_as_dict in input_json["resources"]]
 
-    def get_cached_resources(self) -> List[Path]:
-        return [Path(cached_resource) for cached_resource in self.cached_resources["files"]]
+    def add_resource_file_to_cache(self, resource: Resource):
+        self.cached_resources.append(resource)
+
+    def get_cached_resources(self) -> List[Resource]:
+        return self.cached_resources
 
     def write_cache(self):
+        output_obj = {
+            "resources": [cached_resource.to_dict() for cached_resource in self.cached_resources]
+        }
         with open(self._cache_filepath, "w") as cache_file:
-            json.dump(self.cached_resources, cache_file)
+            json.dump(output_obj, cache_file)
 
 
-def generate_resource_loader(resource_filepaths: List[Path], output_dir: Path):
-    shutil.copyfile(FILE_DIRPATH / "static/resource_loader.h", output_dir / "resource_loader.h")
-    # shutil.copyfile(FILE_DIRPATH / "static/resource_loader.cc", output_dir / "resource_loader.cc")
+def generate_resource_loader(resources: List[Resource], output_dir: Path):
+
+    resource_loader_header_destination_filepath = output_dir / "resource_loader.h"
+    if not resource_loader_header_destination_filepath.exists():
+        shutil.copyfile(FILE_DIRPATH / "static/resource_loader.h", resource_loader_header_destination_filepath)
 
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(FILE_DIRPATH / "templates/"))
     template = environment.get_template("resource_loader.cc.jinja")
 
-    resources = [Resource(resource_filepath, load_data=False) for resource_filepath in resource_filepaths]
+    # resources = [Resource(resource_filepath, load_data=False) for resource_filepath in resource_filepaths]
 
     with open(output_dir / "resource_loader.cc", "w") as output_file:
         output_file.write(template.render(resources=resources))
 
 
-def generate_resource(resource_filepath: Path, output_dir: Path):
+def generate_resource(resource: Resource, output_dir: Path):
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(FILE_DIRPATH / "templates/"))
     template = environment.get_template("resource.cc.jinja")
 
-    resource = Resource(resource_filepath)
-
-    output_filename = f"resource_{resource_filepath.name}.cc"
+    output_filename = f"resource_{resource.filepath.name}.cc"
 
     with open(output_dir / output_filename, "w") as output_file:
         output_file.write(template.render(resource=resource))
 
 
-def generate_resources(resource_filepaths: List[Path], output_dir: Path):
+def generate_resources(resource_filepaths: List[Path], output_dir: Path, prefix: str = ""):
     cache = Cache(output_dir)
     for resource_filepath in resource_filepaths:
-        generate_resource(resource_filepath, output_dir)
-        cache.add_resource_file_to_cache(resource_filepath)
+        resource = Resource(resource_filepath, prefix)
+        generate_resource(resource, output_dir)
+        cache.add_resource_file_to_cache(resource)
     cache.write_cache()
     generate_resource_loader(cache.get_cached_resources(), output_dir)
 
@@ -110,6 +129,8 @@ def generate_resources(resource_filepaths: List[Path], output_dir: Path):
 def parse_cli_args(cli_args: List[str] = None) -> Dict[str, Union[str, bool, List]]:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output_dir", dest="output_dir", default=DEFAULT_OUTPUT_DIRPATH,
+                        help="Output directory")
+    parser.add_argument("-p", "--prefix", dest="prefix", default="",
                         help="Output directory")
     parser.add_argument('resource_files', metavar='resource_files', type=str, nargs='*', help="Resource files to add.")
     return vars(parser.parse_args(cli_args))
@@ -120,8 +141,9 @@ def start():
 
     resource_filepaths = [Path(resource_file) for resource_file in args["resource_files"]]
     output_dir = Path(args["output_dir"])
+    prefix = args["prefix"]
 
-    generate_resources(resource_filepaths, output_dir)
+    generate_resources(resource_filepaths, output_dir, prefix)
 
 
 

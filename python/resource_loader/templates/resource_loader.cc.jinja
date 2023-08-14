@@ -9,7 +9,7 @@
 namespace ResourceLoader {
 
 {% for resource in resources %}
-extern const std::vector<char> data_{{ resource.filepath_hash }};
+extern const std::vector<char> data_{{ resource.name_hash }};
 {%- endfor %}
 
 }
@@ -20,7 +20,7 @@ std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap();
 
 void init(){
 {%- for resource in resources %}
-    getResourcesMap().emplace("{{ resource.filepath }}", ResourceLoader::data_{{ resource.filepath_hash }});
+    getResourcesMap().emplace("{{ resource.name }}", ResourceLoader::data_{{ resource.name_hash }});
 {%- endfor %}
 }
 

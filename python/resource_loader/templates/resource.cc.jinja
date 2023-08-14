@@ -3,7 +3,7 @@
 
 namespace ResourceLoader {
 
-extern const std::vector<char> data_{{ resource.filepath_hash }} = {
+extern const std::vector<char> data_{{ resource.name_hash }} = {
 {%- for data_line in resource.data_lines %}
     {{ data_line }}
 {%- endfor %}
