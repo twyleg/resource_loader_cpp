@@ -7,8 +7,8 @@ set(TARGET_NAME app)
 #
 resource_loader_add_resources(
     TARGET resources
-    example_resource_one.txt
-    example_resource_two.txt
+    resources/example_resource_one.txt
+    resources/example_resource_two.txt
 )
 
 

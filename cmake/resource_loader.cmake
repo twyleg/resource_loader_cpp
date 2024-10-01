@@ -57,18 +57,29 @@ function(resource_loader_add_resources)
 
         foreach(resource_file IN LISTS ARGS_UNPARSED_ARGUMENTS)
 
-		message(STATUS "  - ${resource_file}")
-
                 set(resource_loader_generate_command ${Python3_EXECUTABLE} ${resource_loader_generator_python_script} -o ${resource_loader_generated_src} ${prefix} ${resource_file})
-
-                get_filename_component(output_filename ${resource_file} NAME)
-                set(output_filepath ${resource_loader_generated_src}/resource_${output_filename}.cc)
 
                 execute_process(
                         COMMAND ${resource_loader_generate_command}
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        OUTPUT_VARIABLE resource_name_hash
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                        COMMAND_ECHO "NONE"
                 )
 
+                set(output_target_name "resource_${resource_name_hash}")
+                set(output_filepath ${resource_loader_generated_src}/${output_target_name}.cc)
+                get_filename_component(output_filename ${resource_file} NAME)
+
+                if (DEFINED ARGS_PREFIX)
+                    set(identifier ${ARGS_PREFIX}/${output_filename})
+                else()
+                    set(identifier ${output_filename})
+                endif()
+
+                message(STATUS "  - File: \"${CMAKE_CURRENT_SOURCE_DIR}/${resource_file}\", Identifier: \"${identifier}\", Hash: \"${resource_name_hash}\"")
+
+                # Command to generate C++ resource file from resource file
 		add_custom_command(
 			OUTPUT ${output_filepath}
                         COMMAND ${resource_loader_generate_command}
@@ -77,10 +88,16 @@ function(resource_loader_add_resources)
                         COMMENT "Generating resource: ${CMAKE_CURRENT_SOURCE_DIR}/${resource_file} -> ${output_filepath}"
 		)
 
-                add_custom_target(${output_filename} DEPENDS ${output_filepath})
+                # Target that represents the generated C++ resource file and
+                # is depending on the generated C++ resource file.
+                # The custom command will provide the dependency.
+                add_custom_target(${output_target_name} DEPENDS ${output_filepath})
 
+                # Add the generated C++ resource file to the given targets name
                 target_sources(${ARGS_TARGET} PRIVATE ${output_filepath})
-                add_dependencies(${ARGS_TARGET} ${output_filename})
+                # Add the custom target from two steps earlier as a dependency of the target
+                # to regenerate the C++ resource file when the original resource file is cchanged.
+                add_dependencies(${ARGS_TARGET} ${output_target_name})
 
 	endforeach()
 

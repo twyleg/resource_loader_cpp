@@ -14,8 +14,8 @@ find_package(fmt REQUIRED)
 resource_loader_add_resources(
     TARGET resources
     PREFIX liba
-    example_resource_from_lib.txt
-    example_resource_from_liba.txt
+    resources/example_resource_from_lib.txt
+    resources/example_resource_from_liba.txt
 )
 
 
@@ -26,8 +26,6 @@ resource_loader_add_resources(
 add_library(${TARGET_NAME}
 	liba.cc
 	liba.h
-        example_resource_from_lib.txt
-        example_resource_from_lib.txt
 )
 
 

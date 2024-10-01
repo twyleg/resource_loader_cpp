@@ -116,7 +116,7 @@ class ResourceLoaderGenerator:
             output_file.write(template.render(resources=self.cache.cached_resources.values()))
 
     def _generate_resource_cpp_file(self, resource: Resource) -> None:
-        output_filename = f"resource_{resource.filepath.name}.cc"
+        output_filename = f"resource_{resource.name_hash}.cc"
         output_filepath = self.output_dir_path / output_filename
         if not output_filepath.exists() or os.path.getmtime(resource.filepath) > os.path.getmtime(output_filepath):
             template = self._environment.get_template("resource.cc.jinja")
@@ -136,25 +136,25 @@ def parse_cli_args(cli_args: List[str] = None) -> argparse.Namespace:
                         help="Output directory")
     parser.add_argument("-p", "--prefix", dest="prefix", default=None,
                         help="Resource prefix")
-    parser.add_argument('resource_files', metavar='resource_files', type=str, nargs='*', help="Resource files to add.")
+    parser.add_argument('resource_file', type=str, nargs="?", default=None, help="Resource file to add.")
     return parser.parse_args(cli_args)
 
 def main():
     args = parse_cli_args()
 
-    resource_file_paths = [Path(resource_file) for resource_file in args.resource_files]
     output_dir_path = Path(args.output_dir)
-
     output_dir_path.mkdir(parents=True, exist_ok=True)
-
     resource_loader_generator = ResourceLoaderGenerator(output_dir_path)
 
-    for resource_file_path in resource_file_paths:
+    if args.resource_file:
+        resource_file_path = Path(args.resource_file)
         resource_name = f"{args.prefix}/{resource_file_path.name}" if args.prefix else resource_file_path.name
         resource = Resource(resource_file_path.absolute(), resource_name)
         resource_loader_generator.add_resource(resource)
+        print(resource.name_hash)
 
     resource_loader_generator.generate()
+
 
 if __name__ == '__main__':
     main()

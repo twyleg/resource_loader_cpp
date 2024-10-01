@@ -1,0 +1,1 @@
+Example resource from lib "b" with a common filename

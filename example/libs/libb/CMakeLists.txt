@@ -14,8 +14,8 @@ find_package(fmt REQUIRED)
 resource_loader_add_resources(
     TARGET resources
     PREFIX libb
-    example_resource_from_lib.txt
-    example_resource_from_libb.txt
+    resources/example_resource_from_lib.txt
+    resources/example_resource_from_libb.txt
 )
 
 

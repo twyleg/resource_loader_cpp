@@ -1,4 +1,4 @@
-// Copyright (C) 2020 twyleg
+// Copyright (C) 2024 twyleg
 #include <liba/liba.h>
 #include <libb/libb.h>
 
@@ -15,7 +15,10 @@ int main(int argc, char *argv[]) {
 	fmt::print(ResourceLoader::getResource("example_resource_two.txt"));
 
 	fmt::print(ResourceLoader::getResource("liba/example_resource_from_liba.txt"));
+	fmt::print(ResourceLoader::getResource("liba/example_resource_from_lib.txt"));
+
 	fmt::print(ResourceLoader::getResource("libb/example_resource_from_libb.txt"));
+	fmt::print(ResourceLoader::getResource("libb/example_resource_from_lib.txt"));
 
 	return 0;
 }
