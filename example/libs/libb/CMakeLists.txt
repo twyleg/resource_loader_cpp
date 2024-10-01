@@ -11,8 +11,11 @@ find_package(fmt REQUIRED)
 #
 # Add resource to be embedded in binary
 #
-add_resources(PREFIX libb
-	example_resource_from_libb.txt
+resource_loader_add_resources(
+    TARGET resources
+    PREFIX libb
+    example_resource_from_lib.txt
+    example_resource_from_libb.txt
 )
 
 
@@ -40,7 +43,7 @@ set_target_properties(${TARGET_NAME}
 #
 target_link_libraries(${TARGET_NAME}
 	fmt::fmt
-	resource_loader
+        resources
 )
 
 

@@ -9,13 +9,12 @@ project(resource_loader_example)
 # init_resource_loader() needs to be called from top level CMakeLists.txt before usage of the reosurce loader
 #
 add_subdirectory(external/resource_loader_cpp/)
-init_resource_loader()
+resource_loader_init(TARGET resources)
 
 
 # Libs
-add_subdirectory(liba/)
-add_subdirectory(libb/)
-
+add_subdirectory(libs/liba/)
+add_subdirectory(libs/libb/)
 
 # App
 add_subdirectory(app/)

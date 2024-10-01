@@ -1,0 +1,8 @@
+{
+  "resources": {
+    "8a838e60fb": {
+      "file_path": "example_resource_from_liba.txt",
+      "name": "liba/example_resource_from_liba.txt"
+    }
+  }
+}

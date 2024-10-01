@@ -5,9 +5,10 @@ set(TARGET_NAME app)
 #
 # add resources to be embedded in binary
 #
-add_resources(
-	example_resource_one.txt
-	example_resource_two.txt
+resource_loader_add_resources(
+    TARGET resources
+    example_resource_one.txt
+    example_resource_two.txt
 )
 
 
@@ -15,7 +16,7 @@ add_resources(
 # add source files to target
 #
 add_executable(${TARGET_NAME}
-	main.cc
+    main.cc
 )
 
 
@@ -23,9 +24,9 @@ add_executable(${TARGET_NAME}
 # set target properties
 #
 set_target_properties(${TARGET_NAME}
-	PROPERTIES
-	CXX_STANDARD 17
-	INCLUDE_CURRENT_DIR ON
+    PROPERTIES
+        CXX_STANDARD 17
+        INCLUDE_CURRENT_DIR ON
 )
 
 
@@ -33,7 +34,7 @@ set_target_properties(${TARGET_NAME}
 # link against libs
 #
 target_link_libraries(${TARGET_NAME}
-	resource_loader
-	liba
-	libb
+    resources
+    liba
+    libb
 )

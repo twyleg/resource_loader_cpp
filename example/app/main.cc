@@ -14,5 +14,8 @@ int main(int argc, char *argv[]) {
 	fmt::print(ResourceLoader::getResource("example_resource_one.txt"));
 	fmt::print(ResourceLoader::getResource("example_resource_two.txt"));
 
+	fmt::print(ResourceLoader::getResource("liba/example_resource_from_liba.txt"));
+	fmt::print(ResourceLoader::getResource("libb/example_resource_from_libb.txt"));
+
 	return 0;
 }

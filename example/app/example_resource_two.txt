@@ -1,2 +1,1 @@
 example resource two from app
-

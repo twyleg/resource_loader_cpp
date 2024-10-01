@@ -11,8 +11,11 @@ find_package(fmt REQUIRED)
 #
 # add resource to be embedded in binary
 #
-add_resources(PREFIX liba
-	example_resource_from_liba.txt
+resource_loader_add_resources(
+    TARGET resources
+    PREFIX liba
+    example_resource_from_lib.txt
+    example_resource_from_liba.txt
 )
 
 
@@ -23,6 +26,8 @@ add_resources(PREFIX liba
 add_library(${TARGET_NAME}
 	liba.cc
 	liba.h
+        example_resource_from_lib.txt
+        example_resource_from_lib.txt
 )
 
 
@@ -41,7 +46,7 @@ set_target_properties(${TARGET_NAME}
 #
 target_link_libraries(${TARGET_NAME}
 	fmt::fmt
-	resource_loader
+        resources
 )
 
 
