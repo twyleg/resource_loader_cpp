@@ -3,22 +3,15 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace ResourceLoader {
 
-//class Resource {
-
-//private:
-
-//public:
-
-//	Resource(const std::string& resourceName, const std::vector<char>& resourceData);
-
-//};
-
 void init();
 
-std::string_view getResource(const std::string& resourceName);
+std::string_view getResourceAsString(const std::string& resourceName);
+const std::vector<unsigned char>& getResourceAsVector(const std::string& resourceName);
+void saveResourceToFile(const std::string& resourceName, const std::filesystem::path& filePath);
 
 }
 

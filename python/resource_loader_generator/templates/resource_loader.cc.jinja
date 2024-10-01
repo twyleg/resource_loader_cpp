@@ -4,19 +4,19 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <iostream>
+#include <fstream>
 
 namespace ResourceLoader {
 
 {% for resource in resources %}
-extern const std::vector<char> data_{{ resource.name_hash }};
+extern const std::vector<unsigned char> data_{{ resource.name_hash }};
 {%- endfor %}
 
 }
 
 namespace {
 
-std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap();
+std::unordered_map<std::string, const std::vector<unsigned char>&>& getResourcesMap();
 
 void init(){
 {%- for resource in resources %}
@@ -24,8 +24,8 @@ void init(){
 {%- endfor %}
 }
 
-std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap() {
-    static std::unordered_map<std::string, const std::vector<char>&> resourceMap;
+std::unordered_map<std::string, const std::vector<unsigned char>&>& getResourcesMap() {
+    static std::unordered_map<std::string, const std::vector<unsigned char>&> resourceMap;
 
     static bool isInitialized = false;
     if (!isInitialized) {
@@ -41,12 +41,21 @@ std::unordered_map<std::string, const std::vector<char>&>& getResourcesMap() {
 namespace ResourceLoader {
 
 
-std::string_view getResource(const std::string& resourceName){
+std::string_view getResourceAsString(const std::string& resourceName){
 	auto& resource = getResourcesMap().find(resourceName)->second;
-	return std::string_view(resource.data(), resource.size());
+	return std::string_view(reinterpret_cast<const char*>(resource.data()), resource.size());
 }
 
+const std::vector<unsigned char>& getResourceAsVector(const std::string& resourceName){
+    auto& resource = getResourcesMap().find(resourceName)->second;
+    return resource;
+}
 
+void saveResourceToFile(const std::string& resourceName, const std::filesystem::path& filePath){
+    const auto& resource = getResourceAsVector(resourceName);
+    std::ofstream outputStream(filePath, std::ios::binary);
+    outputStream.write(reinterpret_cast<const char*>(resource.data()), resource.size());
+}
 
 
 }

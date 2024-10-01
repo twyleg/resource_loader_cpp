@@ -3,7 +3,10 @@
 
 namespace ResourceLoader {
 
-extern const std::vector<char> data_{{ resource.name_hash }} = {
+// Identifier: "{{ resource.name }}"
+// Size: {{ resource.size }}
+
+extern const std::vector<unsigned char> data_{{ resource.name_hash }} = {
 {%- for data_line in resource.data_lines %}
     {{ data_line }}
 {%- endfor %}

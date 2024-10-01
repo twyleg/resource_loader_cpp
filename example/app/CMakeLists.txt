@@ -7,8 +7,9 @@ set(TARGET_NAME app)
 #
 resource_loader_add_resources(
     TARGET resources
-    resources/example_resource_one.txt
-    resources/example_resource_two.txt
+    resources/txt/example_resource_one.txt
+    resources/txt/example_resource_two.txt
+    resources/img/STS-129_Atlantis_Ready_to_Fly.jpg
 )
 
 

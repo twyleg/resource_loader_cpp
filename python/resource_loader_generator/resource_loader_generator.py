@@ -16,11 +16,12 @@ FILE_DIR = Path(__file__).parent
 
 
 class Resource:
-    def __init__(self, filepath: Path, name: str, load_data=True):
+    def __init__(self, filepath: Path, name: str):
         self.filepath = filepath
         self.name = name
         self.name_hash = self._generate_short_hash(self.name)
-        self.data_lines: List[str] | None = self._load_data_lines_from_file(filepath) if load_data else None
+        self.size = 0
+        self.data_lines: List[str] = []
 
     def to_dict(self) -> dict:
         return {
@@ -30,7 +31,7 @@ class Resource:
 
     @classmethod
     def from_dict(cls, resource_as_dict: Dict[str, str]) -> "Resource":
-        return Resource(Path(resource_as_dict["file_path"]), resource_as_dict["name"], load_data=True)
+        return Resource(Path(resource_as_dict["file_path"]), resource_as_dict["name"])
 
     @classmethod
     def _generate_short_hash(cls, input: str):
@@ -40,21 +41,20 @@ class Resource:
     def _chunks(cls, lst, n):
         return [lst[i:i + n] for i in range(0, len(lst), n)]
 
-    @classmethod
-    def _load_data_lines_from_file(cls, filepath: Path) -> List[str]:
+
+    def load_data(self) -> None:
         values = []
-        with open(filepath, "r") as file:
+        with open(self.filepath, "rb") as file:
             while True:
                 c = file.read(1)
+                self.size += 1
                 if not c:
                     break
                 values.append(ord(c))
 
-        data_lines = []
-        for chunk in cls._chunks(values, 8):
-            data_lines.append(" ".join(["{0:#0{1}x},".format(value, 4) for value in chunk]))
+        for chunk in self._chunks(values, 8):
+            self.data_lines.append(" ".join(["{0:#0{1}x},".format(value, 4) for value in chunk]))
 
-        return data_lines
 
 class Cache:
 
@@ -125,7 +125,10 @@ class ResourceLoaderGenerator:
 
     def add_resource(self, resource: Resource):
         if resource not in self.cache:
+            resource.load_data()
             self.cache.add_resource(resource)
+        else:
+            self.cache.cached_resources[resource.name_hash].load_data()
 
 
 
