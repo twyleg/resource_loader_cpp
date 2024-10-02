@@ -1,1 +1,2 @@
-include resource_loader_generator/resources/*
+include resource_loader_generator/resources/static/*.h
+include resource_loader_generator/resources/templates/*.jinja

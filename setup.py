@@ -1,4 +1,4 @@
-# Copyright (C) 2022 twyleg
+# Copyright (C) 2024 twyleg
 from pathlib import Path
 
 import versioneer

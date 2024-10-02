@@ -3,13 +3,13 @@ import argparse
 import hashlib
 import json
 import os
-import sys
 
 import jinja2
 import shutil
 
-from typing import List, Dict, Union, Optional, Any
+from typing import List, Dict
 from pathlib import Path
+
 
 FILE_DIR = Path(__file__).parent
 
@@ -38,7 +38,7 @@ class Resource:
 
     @classmethod
     def _chunks(cls, lst, n):
-        return [lst[i:i + n] for i in range(0, len(lst), n)]
+        return [lst[i : i + n] for i in range(0, len(lst), n)]
 
     def load_data(self) -> None:
         values = []
@@ -81,9 +81,7 @@ class Cache:
         self.cached_resources[resource.name_hash] = resource
 
     def flush(self):
-        output_obj = {
-            "resources": {filename_hash: cached_resource.to_dict() for filename_hash, cached_resource in self.cached_resources.items()}
-        }
+        output_obj = {"resources": {filename_hash: cached_resource.to_dict() for filename_hash, cached_resource in self.cached_resources.items()}}
         with open(self._cache_file_path, "w") as cache_file:
             json.dump(output_obj, cache_file, indent=2)
 
@@ -129,13 +127,11 @@ class ResourceLoaderGenerator:
             self.cache.cached_resources[resource.name_hash].load_data()
 
 
-def parse_cli_args(cli_args: List[str] = None) -> argparse.Namespace:
+def parse_cli_args(cli_args: List[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output_dir", dest="output_dir", default=Path.cwd(),
-                        help="Output directory")
-    parser.add_argument("-p", "--prefix", dest="prefix", default=None,
-                        help="Resource prefix")
-    parser.add_argument('resource_file', type=str, nargs="?", default=None, help="Resource file to add.")
+    parser.add_argument("-o", "--output_dir", dest="output_dir", default=Path.cwd(), help="Output directory")
+    parser.add_argument("-p", "--prefix", dest="prefix", default=None, help="Resource prefix")
+    parser.add_argument("resource_file", type=str, nargs="?", default=None, help="Resource file to add.")
     return parser.parse_args(cli_args)
 
 
@@ -156,5 +152,5 @@ def main():
     resource_loader_generator.generate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

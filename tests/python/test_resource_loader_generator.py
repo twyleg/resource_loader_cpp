@@ -73,9 +73,8 @@ class TestResourceLoader:
     def compile_test_app(self, tmp_path: Path):
         shutil.copyfile(FILE_DIR / "resources/cxx/test_util.cc", tmp_path / "test_util.cc")
         cc_files = glob.glob(str(tmp_path / "*.cc"))
-        command = ["g++", "-o", tmp_path / "test_util"]
+        command = ["g++", "-o", str(tmp_path / "test_util")]
         command.extend(cc_files)
-        print(command)
         run(command)
 
     def run_test_app(self, tmp_path: Path, resource_name: str) -> str:
