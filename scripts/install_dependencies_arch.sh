@@ -13,6 +13,4 @@ pacman -Suy --noconfirm \
 	boost \
 	boost-libs \
 	python \
-	python-pip
-
-pip install Jinja2
+	python-jinja
