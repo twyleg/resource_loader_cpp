@@ -1,8 +1,0 @@
-{
-  "resources": {
-    "086fca48a1": {
-      "file_path": "tests/resources/test_data/test_resource_a.txt",
-      "name": "test_resource_a.txt"
-    }
-  }
-}

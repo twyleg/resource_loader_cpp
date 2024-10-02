@@ -14,7 +14,6 @@ from pathlib import Path
 FILE_DIR = Path(__file__).parent
 
 
-
 class Resource:
     def __init__(self, filepath: Path, name: str):
         self.filepath = filepath
@@ -40,7 +39,6 @@ class Resource:
     @classmethod
     def _chunks(cls, lst, n):
         return [lst[i:i + n] for i in range(0, len(lst), n)]
-
 
     def load_data(self) -> None:
         values = []
@@ -95,7 +93,7 @@ class ResourceLoaderGenerator:
     def __init__(self, output_dir_path: Path):
         self.output_dir_path = output_dir_path
         self.cache = Cache(output_dir_path)
-        self._environment = jinja2.Environment(loader=jinja2.FileSystemLoader(FILE_DIR / "templates/"))
+        self._environment = jinja2.Environment(loader=jinja2.FileSystemLoader(FILE_DIR / "resources/templates/"))
 
     def generate(self):
         self._generate_resource_loader_cpp_files()
@@ -105,7 +103,7 @@ class ResourceLoaderGenerator:
         self.cache.flush()
 
     def _generate_resource_loader_header_files(self):
-        resource_loader_header_source_filepath = FILE_DIR / "static/resource_loader.h"
+        resource_loader_header_source_filepath = FILE_DIR / "resources/static/resource_loader.h"
         resource_loader_header_destination_filepath = self.output_dir_path / "resource_loader.h"
         if not resource_loader_header_destination_filepath.exists():
             shutil.copyfile(resource_loader_header_source_filepath, resource_loader_header_destination_filepath)
@@ -131,8 +129,6 @@ class ResourceLoaderGenerator:
             self.cache.cached_resources[resource.name_hash].load_data()
 
 
-
-
 def parse_cli_args(cli_args: List[str] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output_dir", dest="output_dir", default=Path.cwd(),
@@ -141,6 +137,7 @@ def parse_cli_args(cli_args: List[str] = None) -> argparse.Namespace:
                         help="Resource prefix")
     parser.add_argument('resource_file', type=str, nargs="?", default=None, help="Resource file to add.")
     return parser.parse_args(cli_args)
+
 
 def main():
     args = parse_cli_args()

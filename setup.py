@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "resource_loader_gen = resource_loader.resource_loader:start",
+            "resource_loader_generator = resource_loader.resource_loader:start",
         ]
     },
 )

@@ -1,5 +1,5 @@
 # Copyright (C) 2024 twyleg
-set(resource_loader_generator_python_script ${CMAKE_CURRENT_LIST_DIR}/../python/resource_loader_generator/resource_loader_generator.py CACHE PATH "Resource loader python resource_generator_python_script location ")
+set(resource_loader_generator_python_script ${CMAKE_CURRENT_LIST_DIR}/../resource_loader_generator/resource_loader_generator.py CACHE PATH "Resource loader python resource_generator_python_script location ")
 set(resource_loader_generated_src ${CMAKE_BINARY_DIR}/resource_loader_generated CACHE PATH "Resource loader generated sources location")
 
 
