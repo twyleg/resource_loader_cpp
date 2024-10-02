@@ -11,4 +11,5 @@ apt-get install -y \
 	g++ \
 	libfmt-dev \
 	libboost-all-dev \
+	python3 \
 	python3-jinja2

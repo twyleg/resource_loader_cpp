@@ -11,6 +11,8 @@ pacman -Suy --noconfirm \
 	gcc \
 	fmt \
 	boost \
-	boost-libs
+	boost-libs \
+	python \
+	python-pip
 
 pip install Jinja2

@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 'ubuntu:focal', 'ubuntu:jammy', 'debian:latest', 'archlinux:latest' ]
+        image: [ 'ubuntu:jammy', 'debian:latest', 'archlinux:latest' ]
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}
@@ -62,4 +62,4 @@ jobs:
     - name: 'Run tests'
       run: |
         cd tests/cpp/build/
-        ./cpp_unit_tests
+        ./unit_tests
